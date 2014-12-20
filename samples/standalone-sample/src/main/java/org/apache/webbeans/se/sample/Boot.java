@@ -18,63 +18,33 @@
  */
 package org.apache.webbeans.se.sample;
 
-import java.awt.BorderLayout;
+import org.apache.webbeans.se.sample.gui.LoginWindow;
+
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.swing.JFrame;
-
-import org.apache.webbeans.config.WebBeansContext;
-import org.apache.webbeans.se.sample.gui.LoginWindow;
-import org.apache.webbeans.spi.ContainerLifecycle;
+import javax.enterprise.inject.spi.CDI;
+import javax.swing.*;
 
 public class Boot
 {
-    private static ContainerLifecycle lifecycle = null;
     
     private static JFrame frame = null;
     
-    private static void boot(Object startupObject) throws Exception
-    {
-        try
-        {
-            lifecycle = WebBeansContext.getInstance().getService(ContainerLifecycle.class);
-            lifecycle.startApplication(startupObject);
-            
-        }
-        catch(Exception e)
-        {
-            throw e;
-        }        
-    }
-    
-    private static void shutdown(Object endObject) throws Exception
-    {
-        try
-        {
-            lifecycle.stopApplication(endObject);
-            
-        }
-        catch(Exception e)
-        {
-            throw e;
-        }
-        
-    }
     
     
     public static void main(String[] args) throws Exception
     {
-        boot(null);
      
         frame = new JFrame();
         
-        BeanManager beanManager = lifecycle.getBeanManager();
+        BeanManager beanManager = CDI.current().getBeanManager();
         Bean<?> bean = beanManager.getBeans("loginWindow").iterator().next();
-        
-        LoginWindow loginWindow = (LoginWindow) lifecycle.getBeanManager().getReference(bean, LoginWindow.class, beanManager.createCreationalContext(bean));
+
+        LoginWindow loginWindow = (LoginWindow) beanManager.getReference(bean, LoginWindow.class, beanManager
+                .createCreationalContext(bean));
         
         frame.setTitle("OWB @ Java-SE");
         frame.add(loginWindow,BorderLayout.CENTER);        
@@ -86,7 +56,7 @@ public class Boot
             {
                 try
                 {
-                    Boot.shutdown(e);
+                    //Boot.shutdown(e);
                 }
                 catch (Exception e1)
                 {

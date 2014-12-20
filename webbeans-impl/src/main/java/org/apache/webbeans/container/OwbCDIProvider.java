@@ -18,16 +18,26 @@
  */
 package org.apache.webbeans.container;
 
+import org.apache.webbeans.config.WebBeansContext;
+import org.apache.webbeans.spi.ContainerLifecycle;
+
 import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.CDIProvider;
 
 public class OwbCDIProvider implements CDIProvider
 {
     private static final OwbCDI OWB_CDI = new OwbCDI();
+    private static boolean firstTime = true;
+    private static ContainerLifecycle lifecycle = null;
 
     @Override
     public CDI<Object> getCDI()
     {
+        if (firstTime) {
+            lifecycle = WebBeansContext.getInstance().getService(ContainerLifecycle.class);
+            lifecycle.startApplication(null);
+            firstTime = false;
+        }
         return OWB_CDI;
     }
 }
